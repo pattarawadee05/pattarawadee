@@ -8,7 +8,7 @@ if (isset($_POST['Submit'])) {
     $user = $_POST['auser'];
     $pwd  = $_POST['apwd'];
 
-    // 1. ใช้ Prepared Statement เพื่อป้องกัน SQL Injection
+    // 1. ใช้ Prepared Statement ป้องกัน SQL Injection
     $stmt = $conn->prepare("SELECT * FROM admin WHERE a_username = ? LIMIT 1");
     $stmt->bind_param("s", $user);
     $stmt->execute();
@@ -17,7 +17,7 @@ if (isset($_POST['Submit'])) {
     if ($result->num_rows == 1) {
         $data = $result->fetch_assoc();
         
-        // 2. ตรวจสอบรหัสผ่านแบบเข้ารหัส
+        // 2. ตรวจสอบรหัสผ่าน (แนะนำให้ใน DB เก็บแบบ password_hash)
         if (password_verify($pwd, $data['a_password'])) {
             $_SESSION['aid'] = $data['a_id'];
             $_SESSION['aname'] = $data['a_name'];
@@ -25,10 +25,10 @@ if (isset($_POST['Submit'])) {
             echo "<script>window.location='index2.php';</script>";
             exit();
         } else {
-            $error_msg = "Username หรือ Password ไม่ถูกต้อง";
+            $error_msg = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
         }
     } else {
-        $error_msg = "Username หรือ Password ไม่ถูกต้อง";
+        $error_msg = "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
     }
 }
 ?>
@@ -38,39 +38,43 @@ if (isset($_POST['Submit'])) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>66010914055 ภัทรวดี - Login</title>
+    <title>เข้าสู่ระบบ - ภัทรวดี</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+            background: linear-gradient(45deg, #fbc2eb 0%, #a6c1ee 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
+            justify-content: center;
             font-family: 'Kanit', sans-serif;
         }
-        .login-card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 2.5rem;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
         }
         .btn-pastel {
-            background: linear-gradient(to right, #ff9a9e, #fad0c4);
+            background: linear-gradient(to right, #ee9ca7, #ffdde1);
             border: none;
-            color: #555;
-            font-weight: bold;
+            color: #6a5a5a;
+            font-weight: 500;
             transition: 0.3s;
         }
         .btn-pastel:hover {
-            transform: translateY(-2px);
+            transform: scale(1.03);
             filter: brightness(1.05);
-            color: #000;
         }
         .form-control {
-            border-radius: 10px;
-            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            padding: 12px;
         }
         .form-control:focus {
             border-color: #a6c1ee;
@@ -80,37 +84,33 @@ if (isset($_POST['Submit'])) {
 </head>
 <body>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-5 col-lg-4">
-            <div class="login-card">
-                <div class="text-center mb-4">
-                    <h3 class="fw-bold text-secondary">เข้าสู่ระบบหลังบ้าน</h3>
-                    <p class="text-muted small">ภัทรวดี ขามประโคน (การ์ตูน)</p>
-                </div>
-
-                <?php if($error_msg): ?>
-                    <div class="alert alert-danger py-2 text-center" style="font-size: 0.9rem;">
-                        <?= $error_msg ?>
-                    </div>
-                <?php endif; ?>
-
-                <form method="post" action="">
-                    <div class="mb-3">
-                        <label class="form-label text-muted">Username</label>
-                        <input type="text" name="auser" class="form-control" placeholder="ชื่อผู้ใช้งาน" autofocus required>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label text-muted">Password</label>
-                        <input type="password" name="apwd" class="form-control" placeholder="รหัสผ่าน" required>
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" name="Submit" class="btn btn-pastel py-2 rounded-pill shadow-sm">LOGIN</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+<div class="glass-card">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-secondary">Backend Login</h2>
+        <p class="text-muted">66010914055 ภัทรวดี (การ์ตูน)</p>
     </div>
+
+    <?php if($error_msg): ?>
+        <div class="alert alert-danger text-center py-2 mb-3" style="border-radius: 12px;">
+            <?= $error_msg ?>
+        </div>
+    <?php endif; ?>
+
+    <form method="post" action="">
+        <div class="mb-3">
+            <label class="form-label text-secondary">Username</label>
+            <input type="text" name="auser" class="form-control" placeholder="ระบุชื่อผู้ใช้งาน" autofocus required>
+        </div>
+        <div class="mb-4">
+            <label class="form-label text-secondary">Password</label>
+            <input type="password" name="apwd" class="form-control" placeholder="ระบุรหัสผ่าน" required>
+        </div>
+        <div class="d-grid">
+            <button type="submit" name="Submit" class="btn btn-pastel py-2 shadow-sm rounded-pill">
+                เข้าสู่ระบบ
+            </button>
+        </div>
+    </form>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
