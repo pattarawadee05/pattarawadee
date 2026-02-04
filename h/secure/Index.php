@@ -1,10 +1,10 @@
 <?php
-session_start(); // อย่าลืม start session ที่บรรทัดแรกสุด
-include_once("connectdb.php");
-
+session_start();
 $error_msg = "";
 
 if (isset($_POST['Submit'])) {
+    include_once("connectdb.php");
+    
     $user = $_POST['auser'];
     $pwd  = $_POST['apwd'];
 
@@ -17,13 +17,12 @@ if (isset($_POST['Submit'])) {
     if ($result->num_rows == 1) {
         $data = $result->fetch_assoc();
         
-        // 2. ตรวจสอบรหัสผ่านที่เข้ารหัส (แนะนำใช้ password_hash ตอนสมัคร)
-        // ถ้าใน DB ยังไม่ได้ hash ให้ใช้: if($pwd == $data['a_password'])
+        // 2. ตรวจสอบรหัสผ่านแบบเข้ารหัส
         if (password_verify($pwd, $data['a_password'])) {
             $_SESSION['aid'] = $data['a_id'];
             $_SESSION['aname'] = $data['a_name'];
             
-            header("Location: index2.php");
+            echo "<script>window.location='index2.php';</script>";
             exit();
         } else {
             $error_msg = "Username หรือ Password ไม่ถูกต้อง";
@@ -41,13 +40,13 @@ if (isset($_POST['Submit'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>66010914055 ภัทรวดี - Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400&display=swap" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); /* Pastel Pink to Blue */
+            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
-            justify-content: center;
             font-family: 'Kanit', sans-serif;
         }
         .login-card {
@@ -55,52 +54,62 @@ if (isset($_POST['Submit'])) {
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             background-color: rgba(255, 255, 255, 0.9);
-            padding: 2rem;
-            width: 100%;
-            max-width: 400px;
+            padding: 2.5rem;
         }
         .btn-pastel {
-            background-color: #a6c1ee;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4);
             border: none;
-            color: white;
+            color: #555;
+            font-weight: bold;
             transition: 0.3s;
         }
         .btn-pastel:hover {
-            background-color: #fbc2eb;
-            color: #555;
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            color: #000;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
         }
         .form-control:focus {
-            border-color: #fbc2eb;
-            box-shadow: 0 0 0 0.25 cold rgba(251, 194, 235, 0.25);
+            border-color: #a6c1ee;
+            box-shadow: 0 0 0 0.25rem rgba(166, 193, 238, 0.25);
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="login-card mx-auto">
-        <h2 class="text-center mb-4 text-secondary">เข้าสู่ระบบหลังบ้าน</h2>
-        <h6 class="text-center text-muted mb-4">โดย ภัทรวดี (การ์ตูน)</h6>
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="login-card">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-secondary">เข้าสู่ระบบหลังบ้าน</h3>
+                    <p class="text-muted small">ภัทรวดี ขามประโคน (การ์ตูน)</p>
+                </div>
 
-        <?php if($error_msg != ""): ?>
-            <div class="alert alert-danger text-center py-2" role="alert">
-                <?= $error_msg ?>
-            </div>
-        <?php endif; ?>
+                <?php if($error_msg): ?>
+                    <div class="alert alert-danger py-2 text-center" style="font-size: 0.9rem;">
+                        <?= $error_msg ?>
+                    </div>
+                <?php endif; ?>
 
-        <form method="post" action="">
-            <div class="mb-3">
-                <label class="form-label">Username</label>
-                <input type="text" name="auser" class="form-control" placeholder="กรอกชื่อผู้ใช้" autofocus required>
+                <form method="post" action="">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Username</label>
+                        <input type="text" name="auser" class="form-control" placeholder="ชื่อผู้ใช้งาน" autofocus required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-muted">Password</label>
+                        <input type="password" name="apwd" class="form-control" placeholder="รหัสผ่าน" required>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" name="Submit" class="btn btn-pastel py-2 rounded-pill shadow-sm">LOGIN</button>
+                    </div>
+                </form>
             </div>
-            <div class="mb-4">
-                <label class="form-label">Password</label>
-                <input type="password" name="apwd" class="form-control" placeholder="กรอกรหัสผ่าน" required>
-            </div>
-            <div class="d-grid">
-                <button type="submit" name="Submit" class="btn btn-pastel btn-lg rounded-pill">LOGIN</button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
