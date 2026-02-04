@@ -2,12 +2,21 @@
 session_start();
 include_once("connectdb.php");
 
-// ตรวจสอบความปลอดภัย: ต้อง Login ก่อนเข้าหน้าเดิม
+// ตรวจสอบการ Login
 if (!isset($_SESSION['aid'])) {
-    echo "<script>alert('กรุณาเข้าสู่ระบบก่อน'); window.location='index.php';</script>";
-    exit;
+    header("Location: login.php");
+    exit();
 }
+
+// ระบบค้นหาลูกค้า (ค้นหาจากชื่อหรือเบอร์โทร)
+$search = isset($_GET['search']) ? "%" . $_GET['search'] . "%" : "%";
+// สมมติตารางชื่อ member มีฟิลด์ m_id, m_name, m_email, m_phone
+$stmt = $conn->prepare("SELECT * FROM member WHERE m_name LIKE ? OR m_email LIKE ? ORDER BY m_id DESC");
+$stmt->bind_param("ss", $search, $search);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
+
 <!doctype html>
 <html lang="th">
 <head>
@@ -15,81 +24,106 @@ if (!isset($_SESSION['aid'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>จัดการลูกค้า - ภัทรวดี</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
     <style>
-        body { background-color: #fff5f8; font-family: 'Prompt', sans-serif; }
-        .navbar-pink { background-color: #f06292; }
-        .card { border: none; border-radius: 15px; box-shadow: 0 5px 15px rgba(240, 98, 146, 0.1); }
-        .table thead { background-color: #f8bbd0; color: #ad1457; }
-        .btn-action { border-radius: 50px; font-size: 0.85rem; }
-        .customer-avatar { width: 40px; height: 40px; background-color: #fce4ec; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #f06292; font-weight: bold; }
+        body {
+            background-color: #f0f7ff; /* ฟ้าอ่อนมาก */
+            font-family: 'Kanit', sans-serif;
+        }
+        .navbar-pastel {
+            background: linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%);
+            padding: 1.5rem;
+            border-radius: 0 0 30px 30px;
+        }
+        .card-table {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            background: white;
+        }
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            background-color: #fbc2eb;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .btn-action {
+            border-radius: 10px;
+            transition: 0.2s;
+        }
+        .btn-action:hover {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark navbar-pink shadow-sm">
-    <div class="container">
-        <a class="navbar-brand" href="index2.php">Admin Panel</a>
-        <div class="navbar-text text-white">
-            แอดมิน: <strong><?= htmlspecialchars($_SESSION['aname']); ?></strong>
+<div class="navbar-pastel text-white text-center mb-4 shadow">
+    <h2 class="fw-bold mb-0"><i class="bi bi-people-fill me-2"></i> ระบบจัดการข้อมูลลูกค้า</h2>
+    <p class="small mb-0 opacity-75">Admin Online: <?php echo htmlspecialchars($_SESSION['aname']); ?></p>
+</div>
+
+<div class="container">
+    <div class="d-flex justify-content-center gap-2 mb-4">
+        <a href="index2.php" class="btn btn-white shadow-sm rounded-pill px-4 bg-white">หน้าหลัก</a>
+        <a href="products.php" class="btn btn-white shadow-sm rounded-pill px-4 bg-white">สินค้า</a>
+        <a href="orders.php" class="btn btn-white shadow-sm rounded-pill px-4 bg-white">ออเดอร์</a>
+    </div>
+
+    <div class="card card-table p-4 mb-5">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <h4 class="text-secondary fw-bold">รายชื่อสมาชิกทั้งหมด</h4>
+            </div>
+            <div class="col-md-6">
+                <form method="get" class="input-group">
+                    <input type="text" name="search" class="form-control border-info-subtle rounded-start-pill" placeholder="ค้นหาชื่อหรืออีเมล..." value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+                    <button class="btn btn-info text-white rounded-end-pill px-4" type="submit">ค้นหา</button>
+                </form>
+            </div>
         </div>
-    </div>
-</nav>
 
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 style="color: #ad1457;">👥 รายชื่อลูกค้า</h2>
-        <span class="text-muted small">ภัทรวดี: 66010914055</span>
-    </div>
-
-    <div class="card p-3">
         <div class="table-responsive">
             <table class="table table-hover align-middle">
-                <thead>
+                <thead class="table-light">
                     <tr>
-                        <th>#</th>
-                        <th>ลูกค้า</th>
-                        <th>อีเมล / เบอร์โทรศัพท์</th>
-                        <th>วันที่สมัครสมาชิก</th>
-                        <th class="text-center">จัดการ</th>
+                        <th class="border-0">#</th>
+                        <th class="border-0">ลูกค้า</th>
+                        <th class="border-0">อีเมล</th>
+                        <th class="border-0">เบอร์โทรศัพท์</th>
+                        <th class="border-0 text-center">จัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php
-                    // ดึงข้อมูลลูกค้า
-                    $sql = "SELECT * FROM customers ORDER BY c_id DESC";
-                    $rs = mysqli_query($conn, $sql);
-                    
-                    while ($data = mysqli_fetch_array($rs)) {
-                    ?>
+                    <?php while($row = $result->fetch_assoc()): ?>
                     <tr>
-                        <td><?= $data['c_id']; ?></td>
+                        <td><?php echo $row['m_id']; ?></td>
                         <td>
                             <div class="d-flex align-items-center">
-                                <div class="customer-avatar me-2"><?= mb_substr($data['c_name'], 0, 1); ?></div>
-                                <strong><?= htmlspecialchars($data['c_name']); ?></strong>
+                                <div class="avatar-circle me-3">
+                                    <?php echo mb_substr($row['m_name'], 0, 1, 'UTF-8'); ?>
+                                </div>
+                                <span class="fw-medium"><?php echo htmlspecialchars($row['m_name']); ?></span>
                             </div>
                         </td>
-                        <td>
-                            <div class="small"><?= htmlspecialchars($data['c_email']); ?></div>
-                            <div class="text-muted x-small"><?= htmlspecialchars($data['c_phone'] ?? '-'); ?></div>
-                        </td>
-                        <td><?= date('d/m/Y', strtotime($data['c_reg_date'])); ?></td>
+                        <td class="text-muted"><?php echo htmlspecialchars($row['m_email']); ?></td>
+                        <td><?php echo htmlspecialchars($row['m_phone']); ?></td>
                         <td class="text-center">
-                            <a href="edit_customer.php?id=<?= $data['c_id']; ?>" class="btn btn-sm btn-outline-primary btn-action px-3">แก้ไข</a>
-                            <a href="delete_customer.php?id=<?= $data['c_id']; ?>" 
-                               class="btn btn-sm btn-outline-danger btn-action px-3"
-                               onclick="return confirm('ต้องการลบข้อมูลลูกค้าท่านนี้หรือไม่?')">ลบ</a>
+                            <button class="btn btn-sm btn-outline-primary btn-action me-1"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-sm btn-outline-danger btn-action" onclick="return confirm('ยืนยันการลบลูกค้าท่านนี้?')"><i class="bi bi-trash"></i></button>
                         </td>
                     </tr>
-                    <?php } ?>
+                    <?php endwhile; ?>
                 </tbody>
             </table>
         </div>
-    </div>
-    
-    <div class="mt-4 text-center">
-        <a href="index2.php" class="text-decoration-none text-muted small">← กลับหน้าหลัก</a>
     </div>
 </div>
 

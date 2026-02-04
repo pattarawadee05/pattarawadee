@@ -1,10 +1,10 @@
 <?php
 session_start();
 
-// ตรวจสอบว่าได้ Login หรือยัง ถ้าไม่มี Session ให้เด้งกลับไปหน้า Login
+// ตรวจสอบว่าได้ Login หรือยัง ถ้าไม่มีค่า Session ให้ดีดกลับไปหน้า login.php
 if (!isset($_SESSION['aid'])) {
-    echo "<script>alert('กรุณาเข้าสู่ระบบก่อน'); window.location='index.php';</script>";
-    exit;
+    header("Location: login.php");
+    exit();
 }
 ?>
 
@@ -15,89 +15,104 @@ if (!isset($_SESSION['aid'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dashboard - ภัทรวดี</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
     <style>
-        body { 
-            background-color: #fff5f8; 
-            font-family: 'Prompt', sans-serif;
+        body {
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); /* Blue-Pink Pastel Gradient */
+            font-family: 'Kanit', sans-serif;
+            min-height: 100vh;
         }
-        .navbar-pink { 
-            background-color: #f06292; 
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-        .card-menu {
+        .menu-card {
             border: none;
             border-radius: 20px;
-            transition: transform 0.3s ease;
-            text-decoration: none;
-            color: #ad1457;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             background: white;
-            box-shadow: 0 4px 10px rgba(240, 98, 146, 0.15);
+            text-decoration: none;
+            color: #555;
         }
-        .card-menu:hover {
+        .menu-card:hover {
             transform: translateY(-10px);
-            background-color: #fce4ec;
-            color: #f06292;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            color: #000;
         }
-        .welcome-text {
-            color: #880e4f;
-            font-weight: 600;
+        .icon-box {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 2rem;
         }
-        .logout-btn {
-            background-color: #ff80ab;
-            border: none;
-            color: white;
-        }
-        .logout-btn:hover {
-            background-color: #f50057;
-            color: white;
-        }
+        .bg-pastel-pink { background-color: #ffdeeb; color: #ff85a1; }
+        .bg-pastel-blue { background-color: #d1e9ff; color: #4ea8de; }
+        .bg-pastel-purple { background-color: #f3e5f5; color: #ab47bc; }
+        .bg-pastel-red { background-color: #ffe5e5; color: #ff5252; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark navbar-pink mb-5 shadow">
+<nav class="navbar navbar-expand-lg mb-5">
     <div class="container">
-        <a class="navbar-brand" href="#">Admin Panel - ภัทรวดี</a>
-        <div class="d-flex">
-            <span class="navbar-text text-white me-3">
-                สวัสดีคุณ: <strong><?php echo $_SESSION['aname']; ?></strong>
-            </span>
-            <a href="logout.php" class="btn btn-sm logout-btn rounded-pill px-3">ออกจากระบบ</a>
+        <a class="navbar-brand fw-bold text-secondary" href="#">ADMIN PANEL</a>
+        <div class="ms-auto d-flex align-items-center">
+            <span class="me-3 text-muted">ยินดีต้อนรับ, <strong><?php echo $_SESSION['aname']; ?></strong></span>
+            <a href="logout.php" class="btn btn-outline-danger btn-sm rounded-pill px-3">ออกจากระบบ</a>
         </div>
     </div>
 </nav>
 
 <div class="container">
     <div class="text-center mb-5">
-        <h2 class="welcome-text">ระบบจัดการหลังบ้าน (Back-end System)</h2>
-        <p class="text-muted">ยินดีต้อนรับคุณการ์ตูน เข้าสู่ระบบจัดการข้อมูล</p>
+        <h1 class="fw-bold text-white shadow-sm d-inline-block p-2 px-4 rounded-4" style="background: rgba(255,255,255,0.2);">หน้าหลักแอดมิน - ภัทรวดี</h1>
     </div>
 
     <div class="row g-4 justify-content-center">
         <div class="col-md-3">
-            <a href="products.php" class="card card-menu h-100 p-4 text-center d-block">
-                <div class="mb-3">
-                    <span style="font-size: 3rem;">📦</span>
+            <a href="products.php" class="card h-100 menu-card p-4 text-center">
+                <div class="icon-box bg-pastel-pink">
+                    <i class="bi bi-box-seam"></i>
                 </div>
-                <h5>จัดการสินค้า</h5>
+                <h5 class="fw-bold">จัดการสินค้า</h5>
+                <p class="text-muted small">เพิ่ม แก้ไข ลบรายการสินค้า</p>
             </a>
         </div>
 
         <div class="col-md-3">
-            <a href="orders.php" class="card card-menu h-100 p-4 text-center d-block">
-                <div class="mb-3">
-                    <span style="font-size: 3rem;">📜</span>
+            <a href="orders.php" class="card h-100 menu-card p-4 text-center">
+                <div class="icon-box bg-pastel-blue">
+                    <i class="bi bi-cart-check"></i>
                 </div>
-                <h5>จัดการออเดอร์</h5>
+                <h5 class="fw-bold">จัดการออเดอร์</h5>
+                <p class="text-muted small">ตรวจสอบรายการสั่งซื้อ</p>
             </a>
         </div>
 
         <div class="col-md-3">
-            <a href="customers.php" class="card card-menu h-100 p-4 text-center d-block">
-                <div class="mb-3">
-                    <span style="font-size: 3rem;">👥</span>
+            <a href="customers.php" class="card h-100 menu-card p-4 text-center">
+                <div class="icon-box bg-pastel-purple">
+                    <i class="bi bi-people"></i>
                 </div>
-                <h5>จัดการลูกค้า</h5>
+                <h5 class="fw-bold">จัดการลูกค้า</h5>
+                <p class="text-muted small">ข้อมูลสมาชิกและที่อยู่</p>
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="logout.php" class="card h-100 menu-card p-4 text-center">
+                <div class="icon-box bg-pastel-red">
+                    <i class="bi bi-box-arrow-right"></i>
+                </div>
+                <h5 class="fw-bold">ออกจากระบบ</h5>
+                <p class="text-muted small">Logout ออกจากเซสชั่น</p>
             </a>
         </div>
     </div>
