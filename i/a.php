@@ -24,20 +24,22 @@ if(isset($_POST['Submit'])){
 
 <table border="1">
     <tr>
-        <th>รหัสภาค</th>
-        <th>ชื่อภาค</th>
+        <th>รหัสจังหวัด</th>
+        <th>ชื่อจังหวัด</th>
+        <th>รูป</th>
         <th>ลบ</th>
     </tr>
 <?php
 include_once("connectdb.php");
-$sql = "SELECT * FROM regions";
+$sql = "SELECT * FROM provice";
 $rs = mysqli_query($conn,$sql);
 while($data = mysqli_fetch_array($rs)){
 ?>
     <tr>
-        <td><?php echo $data['r_id']; ?></td>
-        <td><?php echo $data['r_name']; ?></td>
-        <td width="80" align="center"><a href="delete_region.php?id=<?php echo $data['r_id']; ?>" onClick="return confirm('ยืนยันการลบ?');"><img src="images/delete.jpg" width="20"></a></td>
+        <td><?php echo $data['p_id']; ?></td>
+        <td><?php echo $data['p_name']; ?></td>
+        <td><img src="images/<?php echo $data['p_id']; ?>.jpg" width="140"></td>
+        <td width="80" align="center"><a href="delete_regions.php?id=<?php echo $data['p_id']; ?>" onClick="return confirm('ยืนยันการลบ?');"><img src="images/delete.jpg" width="20"></a></td>
     </tr>
 <?php } ?>
 </table>
