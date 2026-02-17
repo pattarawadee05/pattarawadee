@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>66010914055 ภัทรวดี ขามประโคน(การ์ตูน)</title>
+</head>
+
+<body>
+<h1>งานi --66010914055 ภัทรวดี ขามประโคน(การ์ตูน)</h1>
+
+<form method="post" action="" encctype="multipart/form-data">
+    ชื่อจังหวัด <input type="text" name="pname" autofocus required> <br>
+    รูปภาพ<input type="file" name="pimaage" reguired> <br>
+    
+    ภาค
+    <select name="rid">
+<?php
+include_once("connectdb.php");
+$sql = "SELECT * FROM provices";
+$rs = mysqli_query($conn,$sql3);
+while($data = mysqli_fetch_array($rs3)){
+?>
+         <option value="<?php echo $data3['r_id']; ?>"><?php echo $data3['r_name']; ?></option>
+<?php } ?>     
+     </select>
+     <br>
+     
+    <button type="submit" name="Submit"> บันทึก </button>
+</form><br><br>
+
+<?php
+if(isset($_POST['Submit'])){
+    include_once("connectdb.php");
+    $pname = $_POST['pname'];
+	$ext = pathinfo($_FILES['pimage']['name'], PATHINFO_EXTENSION );
+	$rid = $_POST['rid'];
+	
+    $sql2 = "INSERT INTO 'provices' VALUES (NULL, '{$pname}','{$ext}','{$rid}')";
+    mysqli_query($conn,$sql2) or die ("เพิ่มข้อมูลไม่ได้");
+	$pid = mysqli_insert_id($conn);
+	//copy($_FILES['pimage']['tmp_name'], "images/".$pid.".".$ext);
+	move_uploaded_file($_FILES['pimage']['tmp_name'], "images/".$pid.".".$ext); 
+}
+?>
+
+<table border="1">
+    <tr>
+        <th>รหัสจังหวัด</th>
+        <th>ชื่อจังหวัด</th>
+        <th>รูป</th>
+        <th>ลบ</th>
+    </tr>
+<?php
+include_once("connectdb.php");
+$sql = "SELECT * FROM 'provice' AS p INNER JOIN 'regions' AS r ON p.r_id=r.r_id";;
+$rs = mysqli_query($conn,$sql);
+while($data = mysqli_fetch_array($rs)){
+?>
+    <tr>
+        <td><?php echo $data['p_id']; ?></td>
+        <td><?php echo $data['p_name']; ?></td>
+        <td><?php echo $data['r_name']; ?></td>
+        <td><img src="images/<?php echo $data['p_id']; ?>.<?php echo $data['p_ext']; ?>" width="140"></td>
+        <td width="80" align="center"><a href="delete_provice.php?id=<?php echo $data['r_id']; ?>&ext+<?php echo $data['p_ext'] ; ?>"onClick="return confirm('ยืนยันการลบ?');"><img src="images/delete.jpg" width="20"></a></td>
+    </tr>
+<?php } ?>
+</table>
+
+<?php
+mysqli_close($conn);
+?>
+</body>
+</html>
