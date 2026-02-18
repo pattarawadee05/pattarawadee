@@ -7,8 +7,8 @@
 
 <body>
 <h1>งาน k --66010914055 ภัทรวดี ขามประโคน (การ์ตูน)</h1>
-<button type="button" class="btn btn-นิสิต">นิสิต<img src="images/1.jpg" width="400"></button>
-<button type="button" class="btn btn-อาจารย์">อาจารย์<img src="images/2.jpg" width="400"></button>
+<button type="button" onClick="images/1.jpg">นิสิต</button>
+<button type="button" onClick="images/2.jpg">อาจารย์</button>
 
 </body>
 </html>
