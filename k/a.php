@@ -12,14 +12,11 @@
         cursor: pointer;
     }
     .btn-teacher {
-        background-color: #ffc107; 
+        background-color: #ffc107;
         color: black;
         padding: 10px 20px;
         border: none;
         cursor: pointer;
-    }
-    button:hover {
-        opacity: 0.8;
     }
 </style>
 </head>
@@ -27,11 +24,11 @@
 <body>
     <h1>งาน k -- 66010914055 ภัทรวดี ขามประโคน (การ์ตูน)</h1>
 
-    <button type="button" class="btn-student" onclick="window.open('images/1.jpg', '_blank')">
+    <button type="button" class="btn-student" onclick="window.location.href='images/1.jpg'">
         นิสิต
     </button>
 
-    <button type="button" class="btn-teacher" onclick="window.open('images/2.jpg', '_blank')">
+    <button type="button" class="btn-teacher" onclick="window.location.href='images/2.jpg'">
         อาจารย์
     </button>
 
